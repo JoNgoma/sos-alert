@@ -1,0 +1,7 @@
+{
+  "name": "sos-alert",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
