@@ -1,36 +1,85 @@
 <template>
-  <ion-text color="primary">
-    <h1>H1: The quick brown fox jumps over the lazy dog</h1>
-  </ion-text>
+  <ion-page>
+    <ion-content class="ion-padding ion-text-center">
 
-  <ion-text color="secondary">
-    <h2>H2: The quick brown fox jumps over the lazy dog</h2>
-  </ion-text>
+      <!-- Logo / Titre en haut -->
+      <div class="branding">
+        <img src="/assets/logo.png" alt="Logo" class="logo" />
+        <h1 class="title">SOS-ALERTE</h1>
+      </div>
 
-  <ion-text color="tertiary">
-    <h3>H3: The quick brown fox jumps over the lazy dog</h3>
-  </ion-text>
+      <!-- Illustration ou visuel -->
+      <div class="hero">
+        <img src="/assets/illustration.svg" alt="Visuel accueil" />
+      </div>
 
-  <p>
-    <ion-text color="warning"><ion-icon :icon="warning"></ion-icon></ion-text>
-    I saw a werewolf with a Chinese menu in his hand. Walking through the
-    <ion-text color="success"><sub>streets</sub></ion-text> of Soho in the rain. He
-    <ion-text color="medium"><i>was</i></ion-text> looking for a place called Lee Ho Fook's. Gonna get a
-    <ion-text color="danger">big dish of beef chow mein.</ion-text>
-  </p>
+      <!-- Boutons d'action -->
+      <div class="actions">
+        <ion-button expand="block" color="primary" @click="goTo('login')">
+          Se connecter
+        </ion-button>
+        <ion-button expand="block" color="secondary" @click="goTo('signUp')">
+          Créer un compte
+        </ion-button>
+      </div>
+    </ion-content>
+  </ion-page>
 </template>
 
-<script lang="ts">
-  import { IonIcon, IonText } from '@ionic/vue';
-  import { warning } from 'ionicons/icons';
-  import { defineComponent } from 'vue';
+<script setup>
+import { useRouter } from 'vue-router'
+import { IonPage, IonContent, IonButton } from '@ionic/vue'
 
-  export default defineComponent({
-    components: { IonIcon, IonText },
-    setup() {
-      return {
-        warning,
-      };
-    },
-  });
+const router = useRouter()
+const goTo = (routeName) => {
+  router.push({ name: routeName })
+}
 </script>
+
+<style scoped>
+/* Utilisation des variables de thème Ionic */
+ion-content {
+  --background: var(--ion-background-color);
+  --color: var(--ion-text-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Branding */
+.branding {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.logo {
+  width: 3rem;
+  height: auto;
+}
+.title {
+  font-size: 1.4rem;
+  margin-top: 0.2rem;
+  color: var(--ion-color-primary);
+}
+
+/* Illustration */
+.hero {
+  margin: 40px 0;
+}
+.hero img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Boutons d'action */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+ion-button {
+  --color: #fff;
+  font-weight: 600;
+}
+</style>
