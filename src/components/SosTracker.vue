@@ -11,6 +11,8 @@ let audioChunks: Blob[] = [];
 // Secousse
 let lastX = 0, lastY = 0, lastZ = 0;
 const threshold = 15; // sensibilité secousse
+let shakeStartTime: number | null = null; // timestamp début secousse
+const shakeDurationRequired = 3000; // 3 secondes
 
 // --- Permissions ---
 async function requestPermissions() {
@@ -53,6 +55,7 @@ function startForegroundService() {
 }
 
 // --- Fonctions ---
+
 function handleAcceleration(acceleration: DeviceMotionEventAcceleration | null) {
   if (!acceleration) return;
 
@@ -60,15 +63,32 @@ function handleAcceleration(acceleration: DeviceMotionEventAcceleration | null) 
   const deltaY = Math.abs((acceleration.y ?? 0) - lastY);
   const deltaZ = Math.abs((acceleration.z ?? 0) - lastZ);
 
-  if (deltaX + deltaY + deltaZ > threshold) {
-    console.log("Secousse détectée → déclenche SOS");
-    sendSOS();
+  const delta = deltaX + deltaY + deltaZ;
+
+  const now = Date.now();
+
+  if (delta > threshold) {
+    // Début de la secousse
+    if (!shakeStartTime) {
+      shakeStartTime = now;
+    } else {
+      // Vérifie si secousse >= 3s
+      if (now - shakeStartTime >= shakeDurationRequired) {
+        console.log("Secousse continue ≥ 3s → déclenche SOS");
+        sendSOS();
+        shakeStartTime = null; // reset pour éviter multi-trigger
+      }
+    }
+  } else {
+    // Secousse interrompue
+    shakeStartTime = null;
   }
 
   lastX = acceleration.x ?? 0;
   lastY = acceleration.y ?? 0;
   lastZ = acceleration.z ?? 0;
 }
+
 
 async function startTracking() {
   // --- GPS ---

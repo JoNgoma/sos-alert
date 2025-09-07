@@ -14,14 +14,14 @@
       <p class="page-subtitle">Accédez rapidement à vos actions principales</p>
 
       <div class="cards-container">
-        <ion-card class="action-card gradient-blue" @click="goTo('location')">
+        <ion-card class="action-card gradient-blue" @click="goTo('signalLocation')">
           <img src="/assets/location.svg" class="card-icon" />
           <ion-card-header>
             <ion-card-title>Partager ma localisation</ion-card-title>
           </ion-card-header>
         </ion-card>
 
-        <ion-card class="action-card gradient-orange" @click="goTo('report')">
+        <ion-card class="action-card gradient-orange" @click="goTo('signalProblem')">
           <img src="/assets/problem.svg" class="card-icon" />
           <ion-card-header>
             <ion-card-title>Signaler un problème</ion-card-title>

@@ -1,22 +1,116 @@
 <template>
   <ion-page>
+    <!-- Header -->
     <ion-header>
       <ion-toolbar>
-        <ion-title>Contact</ion-title>
+        <ion-title>Contacts</ion-title>
         <ion-buttons slot="end">
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
+    <!-- Content -->
     <ion-content class="ion-padding">
-      <h2>Contactez-nous 📞</h2>
-      <p>Email : support@sos-alerte.com</p>
-      <p>Téléphone : +243 000 000 000</p>
+
+      <!-- Profil du propriétaire -->
+      <div class="profile-card">
+        <img src="/assets/avatar/avatar-owner.png" alt="Josué Ngoma" class="avatar" />
+        <div class="profile-info">
+          <h2>Josué Ngoma</h2>
+          <p class="phone">📞 +243 898 464 570</p>
+          <p class="email">✉️ josuengoma26@gmail.com</p>
+        </div>
+      </div>
+
+      <!-- Liste des contacts -->
+      <ion-list>
+        <ion-item v-for="contact in contacts" :key="contact.phone">
+          <ion-avatar slot="start">
+            <img :src="contact.avatar" :alt="contact.name" />
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ contact.name }}</h2>
+            <p>{{ contact.phone }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton, IonContent } from '@ionic/vue'
+import {
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonMenuButton,
+  IonContent,
+  IonList,
+  IonItem,
+  IonAvatar,
+  IonLabel,
+} from '@ionic/vue'
+
+const contacts = [
+  {
+    avatar: '/assets/avatar/avatar1.png',
+    name: 'Caleb Ngoma',
+    phone: '+243 812 345 678',
+  },
+  {
+    avatar: '/assets/avatar/avatar2.png',
+    name: 'Diva Kangala',
+    phone: '+243 811 721 417',
+  },
+  {
+    avatar: '/assets/avatar/avatar3.png',
+    name: 'Grady Mbele',
+    phone: '+243 991 555 666',
+  },
+  {
+    avatar: '/assets/avatar/avatar4.png',
+    name: 'John Malumba',
+    phone: '+243 822 999 000',
+  },
+  {
+    avatar: '/assets/avatar/avatar5.png',
+    name: 'Maman',
+    phone: '+243 895 402 223',
+  },
+]
 </script>
+
+<style scoped>
+/* Carte du profil propriétaire */
+.profile-card {
+  display: flex;
+  align-items: center;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1rem;
+}
+.profile-info h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.profile-info .phone,
+.profile-info .email {
+  margin: 2px 0;
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+}
+</style>

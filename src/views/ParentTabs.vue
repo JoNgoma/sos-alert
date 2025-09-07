@@ -11,6 +11,7 @@
         <ion-item button @click="goTo('profil')">Profil</ion-item>
         <ion-item button @click="goTo('settings')">Paramètres</ion-item>
         <ion-item button @click="goTo('about')">À propos</ion-item>
+        <ion-item button @click="goTo('deconnect')">Déconnexion</ion-item>
       </ion-list>
     </ion-content>
   </ion-menu>
@@ -20,11 +21,11 @@
     <ion-router-outlet></ion-router-outlet>
 
     <!-- Barre d’onglets -->
-    <ion-tab-bar slot="bottom">
+    <ion-tab-bar v-if="showTabs" slot="bottom">
       <ion-tab-button
         tab="home"
-        href="/home"
-        :selected="currentRoute === '/home'"
+        href="/page/home"
+        :selected="currentRoute === '/page/home'"
       >
         <ion-icon :icon="home" />
         <ion-label>Accueil</ion-label>
@@ -32,8 +33,8 @@
 
       <ion-tab-button
         tab="notifications"
-        href="/home/notifications"
-        :selected="currentRoute === '/home/notifications'"
+        href="/page/notifications"
+        :selected="currentRoute === '/page/notifications'"
       >
         <ion-icon :icon="notifications" />
         <ion-label>Notifications</ion-label>
@@ -41,8 +42,8 @@
 
       <ion-tab-button
         tab="contact"
-        href="/home/contact"
-        :selected="currentRoute === '/home/contact'"
+        href="/page/contact"
+        :selected="currentRoute === '/page/contact'"
       >
         <ion-icon :icon="call" />
         <ion-label>Contact</ion-label>
@@ -52,17 +53,23 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import {
   IonMenu, IonHeader, IonToolbar, IonTitle, IonItem, IonList,
   IonTabs, IonTabBar, IonTabButton, IonLabel, IonIcon, IonRouterOutlet
 } from '@ionic/vue'
 import { home, notifications, call } from 'ionicons/icons'
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const currentRoute = computed(() => route.path)
+
+// Liste des routes où les tabs doivent être masqués
+const hiddenTabRoutes = ['/page/home/problem', '/page/home/location']
+
+// Si la route courante est dans la liste → masquer tabs
+const showTabs = computed(() => !hiddenTabRoutes.includes(currentRoute.value))
+
 const router = useRouter()
 const goTo = (routeName: string) => {
   router.push({ name: routeName })
@@ -72,11 +79,11 @@ const goTo = (routeName: string) => {
 <style scoped>
 /* Met l’onglet actif en bleu */
 ion-tab-button.tab-selected {
-  --color: #007bff;   /* texte et icône actifs */
+  --color: #007bff;
   --color-selected: #007bff;
 }
 
 ion-tab-button {
-  --color: var(--ion-text-color, #666); /* couleur par défaut */
+  --color: var(--ion-text-color, #666);
 }
 </style>
