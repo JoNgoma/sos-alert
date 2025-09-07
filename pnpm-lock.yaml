@@ -41,6 +41,9 @@ importers:
       cordova-plugin-background-mode:
         specifier: ^0.7.3
         version: 0.7.3
+      cordova-plugin-device:
+        specifier: ^3.0.0
+        version: 3.0.0
       cordova-plugin-device-motion:
         specifier: ^2.0.1
         version: 2.0.1
@@ -1582,6 +1585,10 @@ packages:
   cordova-plugin-device-motion@2.0.1:
     resolution: {integrity: sha512-MEsF8HBLYGZCXjRZ3mNqrLZensxBC6FZAuxwbW/7NeIBNoutwpN5hho7/p9JUISDYacQge4K2ahbnQyN4IUZNA==}
     engines: {cordovaDependencies: {3.0.0: {cordova: '>100'}}}
+
+  cordova-plugin-device@3.0.0:
+    resolution: {integrity: sha512-g8fFYOvleeYpklWvHwZ/T8/IzJe/3O0MGVDIUoqBru4v8SNDAbNVD3oOqoOQANBWGFQMg7GIkAAl8errCHZ7zQ==}
+    engines: {cordovaDependencies: {2.1.0: {cordova-electron: '>=3.0.0'}, 3.0.0: {cordova-android: '>=7.0.0', cordova-electron: '>=3.0.0'}, 4.0.0: {cordova: '>100'}}}
 
   core-js-compat@3.45.1:
     resolution: {integrity: sha512-tqTt5T4PzsMIZ430XGviK4vzYSoeNJ6CXODi6c/voxOT6IZqBht5/EKaSNnYiEjjRYxjVz7DQIsOsY0XNi8PIA==}
@@ -4771,6 +4778,8 @@ snapshots:
   cordova-plugin-background-mode@0.7.3: {}
 
   cordova-plugin-device-motion@2.0.1: {}
+
+  cordova-plugin-device@3.0.0: {}
 
   core-js-compat@3.45.1:
     dependencies:

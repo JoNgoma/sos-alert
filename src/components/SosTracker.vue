@@ -4,7 +4,7 @@ import { onMounted, onBeforeUnmount } from "vue";
 import { Geolocation } from "@capacitor/geolocation";
 
 // --- Variables ---
-let watchId: string | number = null;
+let watchId: string | number | null = null;
 let mediaRecorder: MediaRecorder | null = null;
 let audioChunks: Blob[] = [];
 
@@ -12,13 +12,53 @@ let audioChunks: Blob[] = [];
 let lastX = 0, lastY = 0, lastZ = 0;
 const threshold = 15; // sensibilité secousse
 
+// --- Permissions ---
+async function requestPermissions() {
+  // Vérifie et demande les permissions GPS foreground
+  const status = await Geolocation.requestPermissions({
+    permissions: ['location']
+  });
+  console.log("Permissions GPS:", status);
+
+  // Microphone
+  if (!navigator.mediaDevices?.getUserMedia) {
+    console.warn("getUserMedia non dispo sur ce device");
+    return;
+  }
+
+  try {
+    await navigator.mediaDevices.getUserMedia({ audio: true });
+    console.log("Permission micro accordée");
+  } catch (err) {
+    console.error("Permission micro refusée:", err);
+  }
+}
+
+// --- Foreground service Android ---
+function startForegroundService() {
+  const win: any = window;
+  if (win.Capacitor && win.Capacitor.isNative) {
+    if (win.cordova?.plugins?.backgroundMode) {
+      win.cordova.plugins.backgroundMode.setDefaults({
+        title: 'SOS Alert',
+        text: 'Suivi GPS actif en arrière-plan',
+        silent: false
+      });
+      win.cordova.plugins.backgroundMode.enable();
+      console.log("Foreground service activé !");
+    } else {
+      console.warn("Foreground service non disponible");
+    }
+  }
+}
+
 // --- Fonctions ---
-function handleAcceleration(acceleration: DeviceMotionEventAcceleration) {
+function handleAcceleration(acceleration: DeviceMotionEventAcceleration | null) {
   if (!acceleration) return;
 
-  const deltaX = Math.abs(acceleration.x - lastX);
-  const deltaY = Math.abs(acceleration.y - lastY);
-  const deltaZ = Math.abs(acceleration.z - lastZ);
+  const deltaX = Math.abs((acceleration.x ?? 0) - lastX);
+  const deltaY = Math.abs((acceleration.y ?? 0) - lastY);
+  const deltaZ = Math.abs((acceleration.z ?? 0) - lastZ);
 
   if (deltaX + deltaY + deltaZ > threshold) {
     console.log("Secousse détectée → déclenche SOS");
@@ -35,35 +75,29 @@ async function startTracking() {
   watchId = await Geolocation.watchPosition(
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
     (position, err) => {
-      if (err) return;
+      if (err || !position) return;
       console.log("GPS:", position.coords.latitude, position.coords.longitude);
-      // TODO : envoyer au backend en temps réel
+      // TODO : envoyer au backend
     }
   );
 
   // --- Secousse ---
   if (window.DeviceMotionEvent) {
     window.addEventListener("devicemotion", (event: DeviceMotionEvent) => {
-      handleAcceleration(event.accelerationIncludingGravity!);
+      handleAcceleration(event.accelerationIncludingGravity ?? null);
     });
   }
-
-  // --- Audio (navigateur) ---
-  startAudioRecording(5000); // 5 secondes
 }
 
 function sendSOS() {
   console.log("SOS déclenché !");
-  alert("SOS déclenché !"); // test temporaire
-
-  // --- Audio ---
+  alert("SOS déclenché !");
   startAudioRecording(5000);
-  // TODO : envoyer coords + audio au backend
 }
 
 async function startAudioRecording(duration: number) {
   if (!navigator.mediaDevices?.getUserMedia) {
-    console.warn("getUserMedia non disponible sur ce device");
+    console.warn("getUserMedia non disponible");
     return;
   }
 
@@ -73,7 +107,6 @@ async function startAudioRecording(duration: number) {
     audioChunks = [];
 
     mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-
     mediaRecorder.onstop = () => {
       const blob = new Blob(audioChunks, { type: "audio/webm" });
       console.log("Audio enregistré:", blob);
@@ -89,22 +122,11 @@ async function startAudioRecording(duration: number) {
   }
 }
 
-// --- Background Mode ---
-function enableBackgroundMode() {
-  if (
-    window.cordova?.plugins?.backgroundMode
-  ) {
-    window.cordova.plugins.backgroundMode.enable();
-    console.log("Background Mode activé !");
-  } else {
-    console.warn("Background Mode non disponible (PWA ou navigateur)");
-  }
-}
-
 // --- Lifecycle ---
-onMounted(() => {
-  enableBackgroundMode(); // Active le mode background si possible
-  startTracking();        // Démarre GPS + secousse + audio
+onMounted(async () => {
+  await requestPermissions();
+  startForegroundService();  // IMPORTANT : Android 10+ foreground service
+  startTracking();
 });
 
 onBeforeUnmount(() => {
@@ -114,6 +136,5 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <!-- Invisible, tracker actif en arrière-plan -->
-  <div style="display: none;"></div>
+  <div style="display:none;"></div>
 </template>
