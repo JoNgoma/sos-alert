@@ -3,7 +3,7 @@
     <ion-content class="ion-padding ion-text-center">
 
       <!-- Illustration -->
-      <div class="hero">
+      <div class="hero" @click="goTo('homeFirst')" style="cursor: pointer;">
         <img src="/assets/illustration.svg" alt="Login Illustration" />
       </div>
 

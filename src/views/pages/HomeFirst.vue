@@ -4,12 +4,12 @@
 
       <!-- Logo / Titre en haut -->
       <div class="branding">
-        <img src="/assets/logo.png" alt="Logo" class="logo" />
+        <img src="/assets/logo.png" alt="Logo" class="logo"/>
         <h1 class="title">SOS-ALERTE</h1>
       </div>
 
       <!-- Illustration ou visuel -->
-      <div class="hero">
+      <div class="hero" @click="goTo('home')" style="cursor: pointer;">
         <img src="/assets/illustration.svg" alt="Visuel accueil" />
       </div>
 
