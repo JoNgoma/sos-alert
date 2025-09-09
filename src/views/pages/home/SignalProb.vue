@@ -52,7 +52,7 @@
       </ion-card>
 
       <!-- Motif du problème -->
-      <ion-card class="form-card">
+      <ion-card class="form-card padding-chat">
         <ion-card-header>
           <ion-card-title>📝 Motif</ion-card-title>
         </ion-card-header>
@@ -158,7 +158,9 @@ const submitReport = () => {
   border-radius: 14px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
-
+.padding-chat {
+  margin-bottom: 2.5rem;
+}
 /* Texte localisation */
 .location-text {
   margin-top: 0.5rem;
