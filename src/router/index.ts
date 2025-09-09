@@ -8,7 +8,8 @@ import SignalProb from '@/views/pages/home/SignalProb.vue'
 import ParentTabs from '@/views/ParentTabs.vue'
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { RouteRecordRaw } from 'vue-router'
-import SignalLocation from '@/views/pages/home/SignalLocation.vue'
+import DetailAlert from '@/views/pages/notif/DetailAlert.vue'
+import AlertStatus from '@/views/pages/home/AlertStatus.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -31,18 +32,25 @@ const routes: Array<RouteRecordRaw> = [
         component: HomeNotif,
       },
       {
-        path: 'contact',
-        name: 'contact',
+        path: 'contacts',
+        name: 'contacts',
         component: HomeContact,
       },
       {
         path: 'home/problem',
         name: 'signalProblem',
         component: SignalProb,
-      },{
-        path: 'home/location',
+      },
+      {
+        path: 'home/alert',
         name: 'signalLocation',
-        component: SignalLocation,
+        component: AlertStatus,
+      },
+      {
+        path: 'notifications/:id',
+        name: 'detailAlert',
+        component: DetailAlert,
+        props: true
       },
     ],
   },

@@ -2,21 +2,16 @@
   <ion-page>
     <!-- Header -->
     <ion-header>
-      <ion-toolbar>
-        <ion-title>Notifications</ion-title>
-        <ion-buttons slot="end">
-          <ion-menu-button></ion-menu-button>
+      <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+          <ion-back-button default-href="/page/home"></ion-back-button>
         </ion-buttons>
+        <ion-title>Alerte encours</ion-title>
       </ion-toolbar>
     </ion-header>
 
+    <!-- Content -->
     <ion-content class="notifications">
-      <!-- Salutation -->
-      <div class="greeting">
-        <h2>Coucou {{ userName }}</h2>
-        <img class="profile-img" :src="userProfile" alt="Profil" />
-      </div>
-
       <div class="notif-list">
         <div v-for="(notif, index) in notifications" :key="index" class="notif-card">
           <div class="notif-header">
@@ -47,9 +42,9 @@
               expand="block" 
               fill="clear" 
               class="see-more"
-              @click="goToDetail(notif)"
+              @click="toggleStatus(index)"
             >
-              Voir plus
+              {{ notif.status === 'Danger' ? 'Suspendre l\'alerte' : 'Réactiver l\'alerte' }}
             </ion-button>
           </div>
         </div>
@@ -59,12 +54,17 @@
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonHeader, IonToolbar, IonContent, IonButton, IonIcon, IonTitle, IonButtons, IonMenuButton } from "@ionic/vue";
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-const userName = "Josué Ngoma";
-const userProfile = "/assets/avatar/avatar-owner.png";
+import { ref } from 'vue'
+import {
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonBackButton,  
+  IonContent,
+  IonIcon
+} from '@ionic/vue'
 
 interface Notification {
   id: number;
@@ -81,12 +81,19 @@ interface Notification {
   lng: string;
 }
 
-const notifications: Notification[] = [
+// ✅ Mettre notifications dans un ref()
+const notifications = ref<Notification[]>([
   { id:1, status: "Danger", name: "Divine Kangala", type: "text", message: "Je suis en danger...", date: "07/09/2025 14:32", lat: "-4.4113206", lng: "15.3014224" },
   { id:2, status: "Épargné", name: "Grady Mbele", type: "text", message: "Je suis en sécurité.", date: "07/09/2025 12:15", lat: "-4.4153206", lng: "15.9062939" },
   { id:3, status: "Danger", name: "John Malumba", type: "audio", audioUrl: "audio1.mp3", time: "00:45", progress: 40, playing: false, date: "06/09/2025 19:22", lat: "-4.4113206", lng: "15.2682939" },
   { id:4, status: "Épargné", name: "Merdi Mfutu", type: "text", message: "Tout va bien.", date: "06/09/2025 09:10", lat: "-4.4113206", lng: "15.2662939" },
-];
+])
+
+// ✅ Toggle devient réactif
+function toggleStatus(index: number) {
+  const notif = notifications.value[index]
+  notif.status = notif.status === "Danger" ? "Épargné" : "Danger"
+}
 
 function truncateMessage(msg?: string): string {
   if (!msg) return "";
@@ -94,19 +101,10 @@ function truncateMessage(msg?: string): string {
 }
 
 function toggleAudio(index: number) {
-  const notif = notifications[index];
-  if (notif.type === "audio") notif.playing = !notif.playing;
+  const notif = notifications.value[index]
+  if (notif.type === "audio") notif.playing = !notif.playing
 }
-
-function goToDetail(notif: Notification) {
-  router.push({
-    name: 'detailAlert',
-    params: { id: notif.id }
-  })
-}
-
 </script>
-
 
 <style scoped>
 /* Greeting */
@@ -138,6 +136,7 @@ function goToDetail(notif: Notification) {
   flex-direction: column;
   gap: 16px;
   padding: 0 16px 16px;
+  margin-top: 1rem;
 }
 
 /* Card */

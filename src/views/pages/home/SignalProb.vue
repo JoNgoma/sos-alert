@@ -4,38 +4,38 @@
     <ion-header>
       <ion-toolbar color="primary">
         <ion-buttons slot="start">
-          <ion-back-button default-href="/home"></ion-back-button>
+          <ion-back-button default-href="/page/home"></ion-back-button>
         </ion-buttons>
         <ion-title>Signaler un problème</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <!-- Content -->
-    <ion-content class="ion-padding">
-
-      <!-- Intro -->
-      <div class="intro">
-        <h2>🚨 Décrivez votre problème</h2>
-        <p>Sélectionnez les destinataires, ajoutez votre localisation et précisez le motif.</p>
-      </div>
+    <ion-content class="ion-padding content-with-footer">
 
       <!-- Sélection des contacts -->
       <ion-card class="form-card">
         <ion-card-header>
-          <ion-card-title>👥 Choisir les contacts</ion-card-title>
+          <ion-card-title>👥 Selectionner les contacts</ion-card-title>
         </ion-card-header>
-        <ion-list>
-          <ion-item v-for="contact in contacts" :key="contact.phone">
-            <ion-avatar slot="start">
-              <img :src="contact.avatar" :alt="contact.name" />
-            </ion-avatar>
-            <ion-label>
-              <h2>{{ contact.name }}</h2>
-              <p>{{ contact.phone }}</p>
-            </ion-label>
-            <ion-checkbox slot="end" v-model="contact.selected"></ion-checkbox>
-          </ion-item>
-        </ion-list>
+        <ion-card-content>
+          <div class="contacts-grid">
+            <div 
+              v-for="(contact, index) in contacts" 
+              :key="index" 
+              class="contact-card"
+              @click="toggleContact(contact)"
+            >
+              <div class="avatar-wrapper" :class="{ active: contact.selected }">
+                <img :src="contact.avatar" class="avatar" />
+                <div class="select-icon" :class="{ selected: contact.selected }">
+                  <ion-icon :icon="contact.selected ? 'checkmark' : 'add'"></ion-icon>
+                </div>
+              </div>
+              <p class="contact-name">{{ contact.name }}</p>
+            </div>
+          </div>
+        </ion-card-content>
       </ion-card>
 
       <!-- Localisation -->
@@ -44,11 +44,10 @@
           <ion-card-title>📍 Localisation</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <ion-button expand="block" color="secondary" @click="insertLocation">
-            <ion-icon name="location-outline" slot="start"></ion-icon>
-            Ajouter ma position
-          </ion-button>
-          <p v-if="location" class="location-text">Position : {{ location }}</p>
+          <p v-if="location" class="location-text">
+            Position : {{ location.lat }}, {{ location.lng }}
+          </p>
+          <div id="map" v-show="location"></div>
         </ion-card-content>
       </ion-card>
 
@@ -62,18 +61,21 @@
             placeholder="Décrivez le problème..."
             v-model="reason"
             auto-grow
+            :rows="1"
+            class="limited-textarea"
           ></ion-textarea>
         </ion-card-content>
       </ion-card>
 
-      <!-- Bouton Envoyer -->
-      <div class="actions">
-        <ion-button expand="block" class="send-btn" @click="submitReport">
-          🚀 Signaler maintenant
-        </ion-button>
-      </div>
-
     </ion-content>
+
+    <!-- Bouton fixe en bas -->
+    <div class="fixed-footer">
+      <ion-button expand="block" class="send-btn" @click="submitReport">
+        🚀 Signaler maintenant
+      </ion-button>
+    </div>
+
   </ion-page>
 </template>
 
@@ -81,24 +83,62 @@
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonButtons,
   IonBackButton, IonContent, IonCard, IonCardHeader, IonCardTitle,
-  IonCardContent, IonList, IonItem, IonAvatar, IonLabel,
-  IonCheckbox, IonButton, IonIcon, IonTextarea
+  IonCardContent, IonButton, IonTextarea, IonIcon
 } from '@ionic/vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { Geolocation } from '@capacitor/geolocation'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 
 const contacts = ref([
   { avatar: '/assets/avatar/avatar2.png', name: 'Divine Kangala', phone: '+243 811 721 417', selected: false },
   { avatar: '/assets/avatar/avatar5.png', name: 'Maman', phone: '+243 895 402 223', selected: false },
   { avatar: '/assets/avatar/avatar4.png', name: 'John Malumba', phone: '+243 822 999 000', selected: false },
+  { avatar: '/assets/avatar/avatar1.png', name: 'Puissance Kisoka', phone: '+243 822 999 000', selected: false },
+  { avatar: '/assets/avatar/avatar3.png', name: 'Merdi Mfutu', phone: '+243 822 999 000', selected: false },
 ])
 
-const location = ref<string | null>(null)
+function toggleContact(contact: any) {
+  contact.selected = !contact.selected
+}
+
+const location = ref<{ lat: number; lng: number } | null>(null)
 const reason = ref<string>('')
 
-const insertLocation = () => {
-  // Exemple fictif (à remplacer par plugin géolocalisation Capacitor)
-  location.value = 'Kinshasa, RD Congo'
+let map: L.Map | null = null
+let marker: L.Marker | null = null
+
+const loadLocation = async () => {
+  try {
+    const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: true })
+    location.value = {
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude,
+    }
+
+    setTimeout(() => {
+      if (!map) {
+        map = L.map('map').setView([location.value!.lat, location.value!.lng], 15)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map)
+        marker = L.marker([location.value!.lat, location.value!.lng]).addTo(map)
+      } else {
+        if (location.value) {
+          marker!.setLatLng([location.value.lat, location.value.lng])
+          map.setView([location.value.lat, location.value.lng], 15)
+        }
+      }
+    }, 200)
+  } catch (err) {
+    console.error('Erreur localisation :', err)
+    alert('Impossible de récupérer la position GPS.')
+  }
 }
+
+onMounted(() => {
+  loadLocation()
+})
 
 const submitReport = () => {
   const selectedContacts = contacts.value.filter(c => c.selected)
@@ -112,23 +152,9 @@ const submitReport = () => {
 </script>
 
 <style scoped>
-.intro {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-.intro h2 {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: var(--ion-color-primary);
-}
-.intro p {
-  font-size: 0.95rem;
-  color: var(--ion-color-medium);
-}
-
 /* Cartes du formulaire */
 .form-card {
-  margin-bottom: 1.2rem;
+  margin-bottom: 0.5rem;
   border-radius: 14px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
@@ -140,15 +166,109 @@ const submitReport = () => {
   color: var(--ion-color-medium);
 }
 
-/* Bouton envoyer */
-.actions {
-  margin-top: 2rem;
+/* Carte */
+#map {
+  height: 250px;
+  width: 100%;
+  margin-top: 1rem;
+  border-radius: 10px;
+  overflow: hidden;
 }
+
+/* Bouton envoyer */
 .send-btn {
   --background: linear-gradient(135deg, #667eea, #764ba2);
   --color: #fff;
   border-radius: 12px;
   font-weight: 600;
   box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* Footer fixe */
+.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 8px 16px;
+  background: var(--ion-background-color);
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+  z-index: 999;
+}
+
+/* Padding bottom du content pour ne pas cacher le dernier champ */
+.content-with-footer {
+  padding-bottom: 80px;
+}
+
+/* Carrousel horizontal contacts */
+.contacts-grid {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.contacts-grid::-webkit-scrollbar {
+  display: none;
+}
+.contact-card {
+  flex: 0 0 auto;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+}
+.avatar-wrapper {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.avatar-wrapper.active {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 150, 0, 0.25);
+  border-radius: 50%;
+}
+.avatar {
+  margin-top: 0.1rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--ion-color-primary);
+}
+.select-icon {
+  position: absolute;
+  bottom: -0.03rem;
+  left: 80%;
+  transform: translateX(-50%);
+  background: var(--ion-color-light);
+  border-radius: 50%;
+  width: 1.2rem;
+  height: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--ion-color-primary);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.select-icon.selected {
+  background: var(--ion-color-success);
+  color: #fff;
+}
+.contact-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.3rem;
+}
+
+/* Limite textarea à 3 lignes max avec scroll */
+.limited-textarea {
+  resize: none;
+  max-height: 4.5rem; /* 3 lignes approximatives */
+  overflow-y: auto;
 }
 </style>

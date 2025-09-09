@@ -10,7 +10,7 @@
 
       <!-- Illustration ou visuel -->
       <div class="hero" @click="goTo('home')" style="cursor: pointer;">
-        <img src="/assets/illustration.svg" alt="Visuel accueil" />
+        <img src="/assets/illustration.svg" alt="Visuel accueil"/>
       </div>
 
       <!-- Boutons d'action -->

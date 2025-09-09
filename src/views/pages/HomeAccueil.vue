@@ -10,14 +10,18 @@
     </ion-header>
 
     <ion-content class="ion-padding">
-      <h1 class="page-title">SOS-ALERTE</h1>
+      <!-- Logo / Titre en haut -->
+      <div class="branding">
+        <img src="/assets/logo.png" alt="Logo" class="logo"/>
+        <h1 class="page-title">SOS-ALERTE</h1>
+      </div>
       <p class="page-subtitle">Accédez rapidement à vos actions principales</p>
 
       <div class="cards-container">
         <ion-card class="action-card gradient-blue" @click="goTo('signalLocation')">
           <img src="/assets/location.svg" class="card-icon" />
           <ion-card-header>
-            <ion-card-title>Partager ma localisation</ion-card-title>
+            <ion-card-title>Alerte encours</ion-card-title>
           </ion-card-header>
         </ion-card>
 
@@ -53,18 +57,28 @@ const goTo = (routeName: string) => {
 </script>
 
 <style scoped>
-/* mêmes styles que tu avais déjà pour les cards */
+
+.branding {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo {
+  width: 3rem;
+  height: auto;
+}
+
 .page-title {
   font-size: 1.8rem;
   font-weight: 700;
-  margin-top: 1rem;
   color: var(--ion-color-primary);
   text-align: center;
 }
 .page-subtitle {
   font-size: 1rem;
   color: var(--ion-text-color-secondary, #666);
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   text-align: center;
 }
 .cards-container {

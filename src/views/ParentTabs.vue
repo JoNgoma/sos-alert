@@ -41,12 +41,12 @@
       </ion-tab-button>
 
       <ion-tab-button
-        tab="contact"
-        href="/page/contact"
-        :selected="currentRoute === '/page/contact'"
+        tab="contacts"
+        href="/page/contacts"
+        :selected="currentRoute === '/page/contacts'"
       >
         <ion-icon :icon="call" />
-        <ion-label>Contact</ion-label>
+        <ion-label>Contacts</ion-label>
       </ion-tab-button>
     </ion-tab-bar>
   </ion-tabs>
@@ -62,13 +62,13 @@ import { home, notifications, call } from 'ionicons/icons'
 import { computed } from 'vue'
 
 const route = useRoute()
-const currentRoute = computed(() => route.path)
+const currentRoute = computed(() => route.name ?? '')
 
 // Liste des routes où les tabs doivent être masqués
-const hiddenTabRoutes = ['/page/home/problem', '/page/home/location']
+const hiddenTabRoutes = ['signalProblem', 'signalLocation', 'detailAlert']
 
 // Si la route courante est dans la liste → masquer tabs
-const showTabs = computed(() => !hiddenTabRoutes.includes(currentRoute.value))
+const showTabs = computed(() => !hiddenTabRoutes.includes(currentRoute.value as string))
 
 const router = useRouter()
 const goTo = (routeName: string) => {
