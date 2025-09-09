@@ -10,6 +10,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { RouteRecordRaw } from 'vue-router'
 import DetailAlert from '@/views/pages/notif/DetailAlert.vue'
 import AlertStatus from '@/views/pages/home/AlertStatus.vue'
+import ContactChat from '@/views/pages/contacts/ContactChat.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -50,6 +51,12 @@ const routes: Array<RouteRecordRaw> = [
         path: 'notifications/:id',
         name: 'detailAlert',
         component: DetailAlert,
+        props: true
+      },
+      {
+        path: 'contacts/:id',
+        name: 'contactChat',
+        component: ContactChat,
         props: true
       },
     ],

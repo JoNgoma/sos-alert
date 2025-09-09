@@ -65,7 +65,7 @@ const route = useRoute()
 const currentRoute = computed(() => route.name ?? '')
 
 // Liste des routes où les tabs doivent être masqués
-const hiddenTabRoutes = ['signalProblem', 'signalLocation', 'detailAlert']
+const hiddenTabRoutes = ['signalProblem', 'signalLocation', 'detailAlert', 'contactChat']
 
 // Si la route courante est dans la liste → masquer tabs
 const showTabs = computed(() => !hiddenTabRoutes.includes(currentRoute.value as string))
